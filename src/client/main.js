@@ -303,6 +303,8 @@ var startGame = function (gameCode) {
 };
 
 var fold = function () {
+  var myAudio = new Audio('./sound/fold.mp3');
+  myAudio.play();
   socket.emit('moveMade', { move: 'fold', bet: 'Fold' });
 };
 

@@ -24,6 +24,7 @@
     "yarn": "^1.19"
   },
   "devDependencies": {
-    "jest": "^26.0.1"
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.15"
   }
 }
