@@ -38,7 +38,7 @@ socket.on('hostRoom', function (data) {
       $('#startGameArea').html(
         '<br /><button onclick=startGame(' +
           data.code +
-          ') type="submit" class= "waves-effect waves-light green darken-3 white-text btn-flat">Start Game</button >'
+          ') type="submit" class= "waves-effect waves-light green darken-3 white-text btn-flat" >Start Game</button >'
       );
     } else {
       $('#hostModalContent').html(
@@ -188,6 +188,35 @@ socket.on('gameBegin', function (data) {
 
 function playNext() {
   socket.emit('startNextRound', {});
+  startGameBtn();
+}
+
+function hostNameBtn() {
+  var sweep = new Audio('./sound/sweep.mp3');
+  sweep.play();
+}
+
+function pickedBtn() {
+  var hit = new Audio('./sound/hit.mp3');
+  hit.play();
+}
+
+function closeBtn() {
+  var retro = new Audio('./sound/retro.mp3');
+  retro.play();
+}
+
+function startGameBtn(){
+  var push=new Audio('./sound/push.mp3');
+  push.play();
+}
+function foldBtn(){
+  var fold = new Audio('./sound/fold.mp3');
+  fold.play();
+}
+function moneyBtn(){
+  var money = new Audio('./sound/money.mp3');
+  money.play();
 }
 
 socket.on('reveal', function (data) {
@@ -266,10 +295,12 @@ var beginHost = function () {
       4000
     );
     $('#joinButton').removeClass('disabled');
+    closeBtn();
   } else {
     socket.emit('host', { username: $('#hostName-field').val() });
     $('#joinButton').addClass('disabled');
     $('#joinButton').off('click');
+    pickedBtn();
   }
 };
 
@@ -288,6 +319,7 @@ var joinRoom = function () {
     $('#joinModal').closeModal();
     $('#hostButton').removeClass('disabled');
     $('#hostButton').on('click');
+    closeBtn();
   } else {
     socket.emit('join', {
       code: $('#code-field').val(),
@@ -295,17 +327,19 @@ var joinRoom = function () {
     });
     $('#hostButton').addClass('disabled');
     $('#hostButton').off('click');
+    pickedBtn();
   }
 };
 
 var startGame = function (gameCode) {
+  //pickedBtn();
   socket.emit('startGame', { code: gameCode });
+  startGameBtn();
 };
 
 var fold = function () {
-  var myAudio = new Audio('./sound/fold.mp3');
-  myAudio.play();
   socket.emit('moveMade', { move: 'fold', bet: 'Fold' });
+  foldBtn();
 };
 
 var bet = function () {
@@ -323,10 +357,12 @@ var bet = function () {
 
 function call() {
   socket.emit('moveMade', { move: 'call', bet: 'Call' });
+  moneyBtn();
 }
 
 var check = function () {
   socket.emit('moveMade', { move: 'check', bet: 'Check' });
+  foldBtn();
 };
 
 var raise = function () {
@@ -581,10 +617,7 @@ function renderOpponent(name, data) {
             '<div class="col s12 m2 opponentCard"><div class="card green darken-2" ><div class="card-content white-text"><span class="card-title">' +
             name +
             '<br />Check</span><p><div class="center-align"><div class="blankCard" id="opponent-card" /><div class="blankCard" id="opponent-card" /></div><br /><br /><br /><br /><br />' +
-            data.blind +
-            '<br />' +
-            data.text +
-            '</p></div><div class="card-action green darken-3 white-text center-align" style="font-size: 20px;">$' +
+            data.blind + '<br />' + data.text + '</p></div><div class="card-action green darken-3 white-text center-align" style="font-size: 20px;">$' +
             data.money +
             '</div></div></div>'
           );
@@ -743,6 +776,7 @@ function updateBetDisplay() {
 }
 
 function updateBetModal() {
+  moneyBtn();
   $('#betDisplay').html('<h3 class="center-align">$0</h3>');
   document.getElementById('betRangeSlider').value = 0;
   var usernamesMoneyStr = $('#usernamesMoney').text().replace('$', '');
