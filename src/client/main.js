@@ -6,6 +6,9 @@ $(document).ready(function () {
 
 var socket = io();
 var gameInfo = null;
+var temporizador=null;
+var maxTemporizador=5;
+var contadorTemporizador=0;
 
 socket.on('playerDisconnected', function (data) {
   Materialize.toast(data.player + ' disconnected.', 4000);
@@ -192,7 +195,7 @@ function playNext() {
 }
 
 function hostNameBtn() {
-  var sweep = new Audio('./sound/sweep.mp3');
+  var sweep = new Audio('./sound/btn.mp3');
   sweep.play();
 }
 
@@ -207,7 +210,7 @@ function closeBtn() {
 }
 
 function startGameBtn(){
-  var push=new Audio('./sound/push.mp3');
+  var push=new Audio('./sound/baraja.mp3');
   push.play();
 }
 function foldBtn(){
@@ -338,7 +341,9 @@ var startGame = function (gameCode) {
 };
 
 var fold = function () {
-  socket.emit('moveMade', { move: 'fold', bet: 'Fold' });
+   socket.emit('moveMade', { move: 'fold', bet: 'Fold' });
+  clearInterval(temporizador); 
+  $('#progresTurn').html('');
   foldBtn();
 };
 
@@ -357,12 +362,12 @@ var bet = function () {
 
 function call() {
   socket.emit('moveMade', { move: 'call', bet: 'Call' });
-  moneyBtn();
+  hostNameBtn();
 }
 
 var check = function () {
   socket.emit('moveMade', { move: 'check', bet: 'Check' });
-  foldBtn();
+  hostNameBtn();
 };
 
 var raise = function () {
@@ -379,6 +384,7 @@ var raise = function () {
       bet: parseInt($('#raiseRangeSlider').val()),
     });
   }
+  moneyBtn();
 };
 
 function renderCard(card) {
@@ -824,6 +830,7 @@ socket.on('displayPossibleMoves', function (data) {
 });
 
 function renderSelf(data) {
+
   $('#playNext').empty();
   $('#usernamesMoney').text('$' + data.money);
   if (data.text == 'Their Turn') {
@@ -834,9 +841,25 @@ function renderSelf(data) {
     $('#usernamesCards').removeClass('white-text');
     $('#usernamesCards').addClass('black-text');
     $('#status').text('My Turn');
+
+    temporizador = setInterval(function(){
+      if(contadorTemporizador>=maxTemporizador){ 
+	clearInterval(temporizador); 
+	this.fold();
+	contadorTemporizador=0;
+      }else{
+	contadorTemporizador++;
+	$('#progresTurn').html('<progress max="100" value='+(this.contadorTemporizador*2*10)+'>');
+      }
+      console.log(contadorTemporizador);
+    },1000);
+
+
+    //$('#progresTurn').html('<progress max="100" value='+(this.contadorTemporizador)+'>');
     Materialize.toast('My Turn', 4000);
     socket.emit('evaluatePossibleMoves', {});
   } else if (data.text == 'Fold') {
+    $('#progresTurn').html('');
     $('#status').text('You Folded');
     $('#playerInformationCard').removeClass('green');
     $('#playerInformationCard').removeClass('yellow');
@@ -850,8 +873,13 @@ function renderSelf(data) {
     $('#usernameBet').hide();
     $('#usernameCall').hide();
     $('#usernameRaise').hide();
+
+	$('#progresTurn').html('');
   } else {
+
+	$('#progresTurn').html('');
     $('#status').text('');
+    $('#progresTurn').html('');
     $('#usernamesCards').removeClass('black-text');
     $('#usernamesCards').addClass('white-text');
     $('#playerInformationCard').removeClass('grey');
