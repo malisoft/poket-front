@@ -849,7 +849,7 @@ function renderSelf(data) {
 	contadorTemporizador=0;
       }else{
 	contadorTemporizador++;
-	$('#progresTurn').html('<progress max="100" value='+(this.contadorTemporizador*2*10)+'>');
+	$('#progresTurn').html('<progress id="progressBar" max="100" value='+(this.contadorTemporizador*2*10)+'>');
       }
       console.log(contadorTemporizador);
     },1000);
